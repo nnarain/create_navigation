@@ -1,0 +1,4 @@
+<launch>
+    <!-- Spawn pointcloud generator nodes -->
+    <include file="$(find create_navigation)/launch/pointcloud.launch" />
+</launch>
