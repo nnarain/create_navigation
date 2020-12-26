@@ -8,9 +8,13 @@
 
   <license>BSD</license>
 
-  <depend>roscpp</depend>
+  <depend>amcl</depend>
   <depend>create_msgs</depend>
+  <depend>explore_lite</depend>
+  <depend>move_base</depend>
+  <depend>octomap_mapping</depend>
   <depend>pcl_ros</depend>
+  <depend>roscpp</depend>
 
   <buildtool_depend>catkin</buildtool_depend>
 
