@@ -3,12 +3,19 @@
     <include file="$(find create_navigation)/launch/pointcloud.launch" />
 
     <!-- Move base -->
-    <node pkg="move_base" type="move_base" name="move_base">
+    <node pkg="move_base" type="move_base" name="move_base" output="screen">
+        <rosparam file="$(find create_navigation)/config/move_base.yaml" command="load" />
+
         <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
-        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find create_navigation)/config/global_costmap.yaml" command="load" />
+
+        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
         <rosparam file="$(find create_navigation)/config/local_costmap.yaml" command="load" />
+
         <rosparam file="$(find create_navigation)/config/planner.yaml" command="load" />
+
+        <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
+        <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
     </node>
 
     <!-- Mapping -->
