@@ -1,6 +1,7 @@
 <launch>
     <node pkg="create_navigation" type="create_pointcloud_node" name="create_pointcloud_node">
-        <param name="radius" value="0.16495" />
+        <!-- <param name="radius" value="0.16495" /> -->
+        <param name="radius" value="0.22" />
         <param name="height" value="0.0308" />
     </node>
 </launch>

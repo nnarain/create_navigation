@@ -61,7 +61,7 @@ public:
         cloud_.header.frame_id = frame;
         cloud_.is_dense = false;
 
-        // Add the three possible points in the point cloud but at an infinite distance
+        // Add the three invalid points
         cloud_.resize(3);
         cloud_[0] = p_invalid_;
         cloud_[1] = p_invalid_;
@@ -134,8 +134,6 @@ private:
     {
         const auto x = radius * cos(angle);
         const auto y = radius * sin(angle);
-
-        ROS_INFO("Point: (%f, %f, %f)", x, y, height);
 
         return pcl::PointXYZ{x, y, height};
     }
