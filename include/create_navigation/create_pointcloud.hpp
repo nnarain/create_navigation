@@ -18,15 +18,26 @@
 #include <cmath>
 
 /**
- * Convert sensors on the Create robot in a point cloud usable by nav stack
+ * Converter bumper and light sensors on the robot to point cloud messages.
 */
 class CreatePointCloud
 {
     using PointCloud = pcl::PointCloud<pcl::PointXYZ>;
 
-    enum class BumpPosition
+    enum class ContactPosition
     {
         Front, Left, Right, None
+    };
+
+    enum class PointIndex
+    {
+        // Contact sensors
+        ContactFront, ContactLeft, ContactRight,
+        // Light sensors
+        LightLeft, LightLeftFront, LightLeftCenter,
+        LightRight, LightRightFront, LightRightCenter,
+        // An invalid point
+        Invalid,
     };
 
     static constexpr auto INVALID = std::numeric_limits<float>::quiet_NaN();
@@ -58,19 +69,17 @@ public:
             return false;
         }
 
+        cloud_.resize(points_.size());
+
         cloud_.header.frame_id = frame;
         cloud_.is_dense = false;
 
-        // Add the three invalid points
-        cloud_.resize(3);
-        cloud_[0] = p_invalid_;
-        cloud_[1] = p_invalid_;
-        cloud_[2] = p_invalid_;
-
         // Create the three points used when the bumper detects an obstacle
-        p_front_ = getPoint(radius, 0, height);
-        p_left_ = getPoint(radius, M_PI / 4.0f, height);
-        p_right_ = getPoint(radius, -M_PI / 4.0f, height);
+        cloud_[static_cast<size_t>(PointIndex::ContactFront)] = getPoint(radius, 0, height);
+        cloud_[static_cast<size_t>(PointIndex::ContactLeft)] = getPoint(radius, M_PI / 4.0f, height);
+        cloud_[static_cast<size_t>(PointIndex::ContactRight)] = getPoint(radius, -M_PI / 4.0f, height);
+
+        cloud_[static_cast<size_t>(PointIndex::Invalid)] = p_invalid_;
 
         pc_pub_ = nh.advertise<PointCloud>("bumper/pointcloud", 1);
         pub_timer_ = nh.createTimer(ros::Duration{0.1}, &CreatePointCloud::pubTimerCallback, this);
@@ -89,45 +98,45 @@ private:
         // When there is no contact on one of the sensors a point is added at infinity
         switch(bump_state)
         {
-        case BumpPosition::Front:
-            cloud_[0] = p_front_;
-            cloud_[1] = p_invalid_;
-            cloud_[2] = p_invalid_;
+        case ContactPosition::Front:
+            insertPoint(PointIndex::ContactFront);
+            insertPoint(PointIndex::ContactLeft, PointIndex::Invalid);
+            insertPoint(PointIndex::ContactRight, PointIndex::Invalid);
             break;
-        case BumpPosition::Left:
-            cloud_[0] = p_invalid_;
-            cloud_[1] = p_left_;
-            cloud_[2] = p_invalid_;
+        case ContactPosition::Left:
+            insertPoint(PointIndex::ContactLeft);
+            insertPoint(PointIndex::ContactFront, PointIndex::Invalid);
+            insertPoint(PointIndex::ContactRight, PointIndex::Invalid);
             break;
-        case BumpPosition::Right:
-            cloud_[0] = p_invalid_;
-            cloud_[1] = p_invalid_;
-            cloud_[2] = p_right_;
+        case ContactPosition::Right:
+            insertPoint(PointIndex::ContactRight);
+            insertPoint(PointIndex::ContactFront, PointIndex::Invalid);
+            insertPoint(PointIndex::ContactLeft, PointIndex::Invalid);
             break;
-        case BumpPosition::None:
-            cloud_[0] = p_invalid_;
-            cloud_[1] = p_invalid_;
-            cloud_[2] = p_invalid_;
+        case ContactPosition::None:
+            insertPoint(PointIndex::ContactFront, PointIndex::Invalid);
+            insertPoint(PointIndex::ContactLeft, PointIndex::Invalid);
+            insertPoint(PointIndex::ContactRight, PointIndex::Invalid);
             break;
         }
     }
 
-    BumpPosition getBumpState(const create_msgs::Bumper& msg)
+    ContactPosition getBumpState(const create_msgs::Bumper& msg)
     {
         if (msg.is_left_pressed && msg.is_right_pressed)
         {
-            return BumpPosition::Front;
+            return ContactPosition::Front;
         }
         else if (msg.is_left_pressed)
         {
-            return BumpPosition::Left;
+            return ContactPosition::Left;
         }
         else if (msg.is_right_pressed)
         {
-            return BumpPosition::Right;
+            return ContactPosition::Right;
         }
 
-        return BumpPosition::None;
+        return ContactPosition::None;
     }
 
     pcl::PointXYZ getPoint(float radius, float angle, float height)
@@ -144,14 +153,27 @@ private:
         pc_pub_.publish(cloud_);
     }
 
+    void insertPoint(PointIndex idx)
+    {
+        insertPoint(idx, idx);
+    }
+
+    void insertPoint(PointIndex cloud_idx, PointIndex point_idx)
+    {
+        cloud_[static_cast<size_t>(cloud_idx)] = points_[static_cast<size_t>(point_idx)];
+    }
+
     ros::Publisher pc_pub_;
     ros::Timer pub_timer_;
     ros::Subscriber bumper_sub_;
 
+    // The cloud to populate with sensor data
+    // In base_link frame
     PointCloud cloud_;
-    pcl::PointXYZ p_front_;
-    pcl::PointXYZ p_left_;
-    pcl::PointXYZ p_right_;
+    // An array of possible points in the point cloud
+    // 3 contact position points + 6 light sensor points + 1 invalid
+    std::array<pcl::PointXYZ, 3 + 6 + 1> points_;
+    // A point that is invalid
     pcl::PointXYZ p_invalid_;
 };
 
