@@ -1,0 +1,34 @@
+<launch>
+    <!-- Spawn pointcloud generator nodes -->
+    <include file="$(find create_navigation)/launch/pointcloud.launch" />
+
+    <!-- Move base -->
+    <node pkg="move_base" type="move_base" name="move_base" output="screen">
+        <rosparam file="$(find create_navigation)/config/move_base.yaml" command="load" />
+
+        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find create_navigation)/config/global_costmap.yaml" command="load" />
+
+        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find create_navigation)/config/local_costmap.yaml" command="load" />
+
+        <rosparam file="$(find create_navigation)/config/planner.yaml" command="load" />
+
+        <param name="base_global_planner" type="string" value="navfn/NavfnROS" />
+        <param name="base_local_planner" value="base_local_planner/TrajectoryPlannerROS"/>
+    </node>
+
+    <!-- Mapping -->
+    <!-- <node pkg="octomap_server" type="octomap_server_node" name="octo_mapper">
+        <param name="resolution" value="0.05" />
+        <param name="frame_id" type="string" value="map" />
+        <param name="sensor_model/max_range" value="5.0" />
+        <remap from="cloud_in" to="/bumper/pointcloud" />
+    </node> -->
+
+    <!--
+        Exploration
+        Defaults to using the global costmap from move_base
+    -->
+    <!-- <include file="$(find explore_lite)/launch/explore_costmap.launch" /> -->
+</launch>

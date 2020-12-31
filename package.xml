@@ -8,6 +8,16 @@
 
   <license>BSD</license>
 
+  <depend>amcl</depend>
+  <depend>create_msgs</depend>
+  <depend>explore_lite</depend>
+  <depend>geometry_msgs</depend>
+  <depend>move_base</depend>
+  <depend>octomap_mapping</depend>
+  <depend>pcl_ros</depend>
+  <depend>roscpp</depend>
+  <depend>tf</depend>
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <export>
