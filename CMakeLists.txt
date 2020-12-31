@@ -6,14 +6,18 @@ add_compile_options(-std=c++11 -Wall -Werror)
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     create_msgs
+    geometry_msgs
     pcl_ros
+    tf
 )
 
 catkin_package(
     CATKIN_DEPENDS
         roscpp
         create_msgs
+        geometry_msgs
         pcl_ros
+        tf
 )
 
 include_directories(
