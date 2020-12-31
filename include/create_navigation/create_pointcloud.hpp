@@ -162,7 +162,6 @@ private:
     {
         if (sensor >= light_detection_threshold_)
         {
-            ROS_INFO("Adding light detection point: %d", static_cast<int>(idx));
             insertPoint(idx);
         }
         else

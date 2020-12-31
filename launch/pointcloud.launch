@@ -3,6 +3,7 @@
         <!-- <param name="radius" value="0.16495" /> -->
         <param name="radius" value="0.22" />
         <param name="height" value="0.0308" />
-        <param name="light_range" value="0.07" />
+        <param name="light_range" value="0.10" />
+        <param name="light_detect" value="200" />
     </node>
 </launch>
