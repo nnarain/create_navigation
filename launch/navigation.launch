@@ -1,4 +1,6 @@
 <launch>
+    <arg name="track_unknown_space" default="false" />
+
     <!-- Spawn pointcloud generator nodes -->
     <include file="$(find create_navigation)/launch/pointcloud.launch" />
 
@@ -10,7 +12,7 @@
         <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
         <rosparam file="$(find create_navigation)/config/global_costmap.yaml" command="load" />
         <!-- Set to true for frontier discovery -->
-        <param name="global_costmap/track_unknown_space" value="true" />
+        <param name="global_costmap/track_unknown_space" value="$(arg track_unknown_space)" />
 
         <!-- Local Costmap Config -->
         <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
