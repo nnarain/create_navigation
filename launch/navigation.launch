@@ -23,12 +23,17 @@
     </node>
 
     <!-- Mapping -->
-    <!-- <node pkg="octomap_server" type="octomap_server_node" name="octo_mapper">
-        <param name="resolution" value="0.05" />
-        <param name="frame_id" type="string" value="map" />
-        <param name="sensor_model/max_range" value="5.0" />
+    <node pkg="octomap_server" type="octomap_server_node" name="octo_mapper">
+        <param name="frame_id" value="map" />
+        <param name="base_frame_id" value="base_footprint" />
+        <!-- Set to false when building maps -->
+        <param name="latch" value="false" />
+
         <remap from="cloud_in" to="/bumper/pointcloud" />
-    </node> -->
+    </node>
+
+    <!-- Static transform for odom to map frame -->
+    <node pkg="tf" type="static_transform_publisher" name="tf_odom_map" args="0 0 0 0 0 0 map odom 100" />
 
     <!--
         Exploration
