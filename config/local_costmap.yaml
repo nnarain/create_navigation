@@ -6,5 +6,9 @@ local_costmap:
   width: 3.0
   height: 3.0
   resolution: 0.05
-  # static_map: false
   rolling_window: true
+
+
+  plugins:
+    - {name: obstacles_layer, type: "costmap_2d::ObstacleLayer"}
+    - {name: inflation_layer, type: "costmap_2d::InflationLayer"}

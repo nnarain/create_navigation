@@ -1,0 +1,7 @@
+# Parameters for when the map server is running and supplying a map file
+plugins:
+  - {name: static_layer,    type: "costmap_2d::StaticLayer" }
+
+static_layer:
+  map_topic: /map
+  subscribe_to_updates: true
