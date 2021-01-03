@@ -13,7 +13,7 @@
   <depend>explore_lite</depend>
   <depend>geometry_msgs</depend>
   <depend>move_base</depend>
-  <depend>octomap_mapping</depend>
+  <depend>octomap_server</depend>
   <depend>pcl_ros</depend>
   <depend>roscpp</depend>
   <depend>tf</depend>

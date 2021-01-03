@@ -1,6 +1,6 @@
 # Parameters for when the map server is running and supplying a map file
 plugins:
-  - {name: static_layer,    type: "costmap_2d::StaticLayer" }
+  - {name: static_layer, type: "costmap_2d::StaticLayer" }
 
 static_layer:
   map_topic: /map
