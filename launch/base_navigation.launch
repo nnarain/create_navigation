@@ -1,0 +1,29 @@
+<launch>
+    <arg name="using_map" default="false" />
+    <arg name="global_costmap_frame" value="$(eval 'map' if arg('using_map') else 'odom')" />
+    <arg name="track_unknown_space" default="false" />
+
+    <!-- Spawn pointcloud generator node(s) -->
+    <include file="$(find create_navigation)/launch/pointcloud.launch" />
+
+    <!-- Move base -->
+    <node pkg="move_base" type="move_base" name="move_base">
+        <rosparam file="$(find create_navigation)/config/move_base.yaml" command="load" />
+
+        <!-- Global Costmap Config -->
+        <rosparam file="$(find create_navigation)/config/global_costmap.yaml" command="load" />
+        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
+        <rosparam if="$(arg using_map)" file="$(find create_navigation)/config/global_costmap_map.yaml"
+                  command="load" ns="global_costmap" />
+        <param name="global_costmap/global_frame" value="$(arg global_costmap_frame)" />
+        <param name="global_costmap/track_unknown_space" value="$(arg track_unknown_space)" />
+
+        <!-- Local Costmap Config -->
+        <rosparam file="$(find create_navigation)/config/local_costmap.yaml" command="load" />
+        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
+        <param name="local_costmap/track_unknown_space" value="false" />
+
+        <!-- Planner Config -->
+        <rosparam file="$(find create_navigation)/config/planner.yaml" command="load" />
+    </node>
+</launch>

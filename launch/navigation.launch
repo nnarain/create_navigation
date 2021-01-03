@@ -1,50 +1,33 @@
 <launch>
-    <arg name="track_unknown_space" default="false" />
+    <!--
+        nav_mode:
+            free    - No map / not mapping
+            mapping - Building a map
+            map     - Has a map
+    -->
+    <arg name="nav_mode" default="free" />
+    <arg name="map_file" default="$(optenv MAP_FILE '')" />
 
-    <!-- Spawn pointcloud generator nodes -->
-    <include file="$(find create_navigation)/launch/pointcloud.launch" />
+    <arg name="using_map" value="$(eval arg('nav_mode') == 'map')" />
+    <arg name="map_server" value="$(eval arg('nav_mode') != 'free')" />
 
-    <!-- Move base -->
-    <node pkg="move_base" type="move_base" name="move_base">
-        <rosparam file="$(find create_navigation)/config/move_base.yaml" command="load" />
-
-        <!-- Global Costmap Config -->
-        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="global_costmap" />
-        <rosparam file="$(find create_navigation)/config/global_costmap.yaml" command="load" />
-        <!-- Set to true for frontier discovery -->
-        <param name="global_costmap/track_unknown_space" value="$(arg track_unknown_space)" />
-
-        <!-- Local Costmap Config -->
-        <rosparam file="$(find create_navigation)/config/costmap_common.yaml" command="load" ns="local_costmap" />
-        <rosparam file="$(find create_navigation)/config/local_costmap.yaml" command="load" />
-        <param name="local_costmap/track_unknown_space" value="false" />
-
-        <rosparam file="$(find create_navigation)/config/planner.yaml" command="load" />
-    </node>
+    <include file="$(find create_navigation)/launch/base_navigation.launch">
+        <arg name="using_map" value="$(arg using_map)" />
+    </include>
 
     <!-- Mapping -->
-    <!-- <node pkg="octomap_server" type="octomap_server_node" name="octo_mapper">
-        <param name="resolution" value="0.05" />
-        <param name="frame_id" type="string" value="map" />
-        <param name="sensor_model/max_range" value="5.0" />
-        <remap from="cloud_in" to="/bumper/pointcloud" />
-    </node> -->
+    <group if="$(arg map_server)">
+        <arg name="static_map" value="$(eval map_file if nav_mode == 'map' else '')" />
+        <node pkg="octomap_server" type="octomap_server_node" name="octomap" args="$(arg static_map)">
+            <param name="frame_id" value="map" />
+            <param name="base_frame_id" value="base_footprint" />
+            <!-- Set to false when building maps -->
+            <param name="latch" value="$(eval arg('nav_mode') != 'mapping')" />
 
-    <!--
-        Exploration
-        Defaults to using the global costmap from move_base
-    -->
-    <!-- <node pkg="explore_lite" type="explore" respawn="false" name="explore">
-        <param name="robot_base_frame" value="base_link"/>
-        <param name="costmap_topic" value="move_base/global_costmap/costmap"/>
-        <param name="costmap_updates_topic" value="move_base/global_costmap/costmap_updates"/>
-        <param name="visualize" value="true"/>
-        <param name="planner_frequency" value="0.33"/>
-        <param name="progress_timeout" value="30.0"/>
-        <param name="potential_scale" value="3.0"/>
-        <param name="orientation_scale" value="0.0"/>
-        <param name="gain_scale" value="1.0"/>
-        <param name="transform_tolerance" value="0.3"/>
-        <param name="min_frontier_size" value="0.5"/>
-    </node> -->
+            <remap from="cloud_in" to="/bumper/pointcloud" />
+            <remap from="projected_map" to="map" />
+        </node>
+        <!-- Static transform for odom to map frame -->
+        <node pkg="tf" type="static_transform_publisher" name="tf_odom_map" args="0 0 0 0 0 0 map odom 100" />
+    </group>
 </launch>

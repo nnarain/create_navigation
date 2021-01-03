@@ -48,7 +48,6 @@ class CreatePointCloud
 
 public:
     CreatePointCloud()
-        : p_invalid_{INVALID, INVALID, INVALID}
     {
     }
 
@@ -80,14 +79,15 @@ public:
         cloud_.header.frame_id = frame;
         cloud_.is_dense = false;
 
-        cloud_.resize(points_.size());
+        // Points contains one invalid point, therefore cloud points in one less.
+        cloud_.resize(points_.size() - 1);
 
         // Create the three points used when the bumper detects an obstacle
         points_[static_cast<size_t>(PointIndex::ContactFront)] = getPointOnRadius(radius, 0, height);
         points_[static_cast<size_t>(PointIndex::ContactLeft)] = getPointOnRadius(radius, M_PI / 4.0f, height);
         points_[static_cast<size_t>(PointIndex::ContactRight)] = getPointOnRadius(radius, -M_PI / 4.0f, height);
 
-        points_[static_cast<size_t>(PointIndex::Invalid)] = p_invalid_;
+        points_[static_cast<size_t>(PointIndex::Invalid)] = pcl::PointXYZ{INVALID, INVALID, INVALID};
 
         // Insert defaults points
         insertPoint(PointIndex::ContactFront, PointIndex::Invalid);
@@ -269,8 +269,6 @@ private:
     // An array of possible points in the point cloud
     // 3 contact position points + 6 light sensor points + 1 invalid
     std::array<pcl::PointXYZ, 3 + 6 + 1> points_;
-    // A point that is invalid
-    pcl::PointXYZ p_invalid_;
 
     uint16_t light_detection_threshold_;
 
