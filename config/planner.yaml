@@ -11,9 +11,15 @@ TrajectoryPlannerROS:
 
   meter_scoring: true
 
-  # Goal Tolerance Parameters
+  dwa: false                # (default: true)
+
+  occdist_scale:  0.1 #The weighting for how much the controller should attempt to avoid obstacles. default 0.01
+  path_distance_bias: 0.75  #     The weighting for how much the controller should stay close to the path it was given . default 0.6
+  goal_distance_bias: 1.0 #     The weighting for how much the controller should attempt to reach its local goal, also controls speed  default 0.8
+
+  # # Goal Tolerance Parameters
   yaw_goal_tolerance: 0.157
-  xy_goal_tolerance: 0.1
+  xy_goal_tolerance: 0.25
   latch_xy_goal_tolerance: false
 
   # Forward Simulation Parameters
@@ -24,5 +30,7 @@ TrajectoryPlannerROS:
   vtheta_samples: 20
   controller_frequency: 20.0
 
-  # Trajectory scoring parameters
-  occdist_scale:  0.1 #The weighting for how much the controller should attempt to avoid obstacles. default 0.01
+  # Oscillation Prevention Parameters
+  oscillation_reset_dist: 0.05 #How far the robot must travel in meters before oscillation flags are reset (double, default: 0.05)
+  escape_reset_dist: 0.1
+  escape_reset_theta: 0.1
