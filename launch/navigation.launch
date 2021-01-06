@@ -8,14 +8,15 @@
     <arg name="nav_mode" default="odom" />
     <arg name="map_file" default="$(optenv MAP_FILE '')" />
 
-    <arg name="using_map" value="$(eval arg('nav_mode') != 'odom')" />
+    <arg name="using_map" value="$(eval arg('nav_mode') == 'map')" />
+    <arg name="using_map_server" value="$(eval arg('nav_mode') != 'odom')" />
 
     <include file="$(find create_navigation)/launch/base_navigation.launch">
         <arg name="using_map" value="$(arg using_map)" />
     </include>
 
     <!-- Mapping -->
-    <group if="$(arg using_map)">
+    <group if="$(arg using_map_server)">
         <arg name="static_map" value="$(eval map_file if nav_mode == 'map' else '')" />
         <node pkg="octomap_server" type="octomap_server_node" name="octomap" args="$(arg static_map)">
             <param name="frame_id" value="map" />
