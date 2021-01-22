@@ -38,7 +38,9 @@ target_link_libraries(create_pointcloud_node
 #-----------------------------------------------------------------------------------------------------------------------
 
 install(
-    DIRECTORY launch
+    DIRECTORY
+        launch
+        config
     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
